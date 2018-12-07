@@ -1,0 +1,77 @@
+'VBA script to extract specified pages of multiple pdf files
+'To use this script, create an Excel spreadsheet that lists the pdf file you want to extract from, and the page
+'Column A listed the pdf file's file path
+'Column C lists the target pages to extract
+'Column E lists the name you want for your extracted pages.
+'Modify the code to loop over however many files you want to loop through
+
+Sub ExtractPdf()
+
+    Dim pdfNew As New Acrobat.AcroPDDoc
+    Dim pdfSource As New AcroPDDoc
+    Dim Target As Integer
+    Dim i As Integer
+
+       
+    'Loop through 315 pdf files - modify 317 to fit your needs. For example, if you have 450 pdf files to loop through,
+    'your code should say For i = 2 To 452
+    For i = 2 To 317
+
+        pdfNew.Create
+
+        pdfSource.Open Sheet2.Range("A" & i).Value
+
+        Target = Sheet2.Range("C" & i).Value
+
+        'Fund = Sheet2.Range("B" & i).Value
+
+        File = Sheet2.Range("E" & i).Value
+
+
+        If pdfNew.InsertPages(-1, pdfSource, Target - 1, 1, False) = False Then
+
+            'MsgBox "Cannot insert pages"
+
+            Range("D" & i).Value = "Protected"
+            
+        'This script does not work on protected PDF files that doesn't allow page extraction
+           
+
+        End If
+
+ 
+
+        If pdfNew.InsertPages(-1, pdfSource, Target - 1, 1, False) = True Then
+        
+        'Replace C:\FileRoute with the file destination you want.
+            If pdfNew.Save(PDSaveFull, "C:\FileRoute" & File & "page" & Target & ".pdf") = False Then
+
+            MsgBox "Cannot save the modified document"
+
+            End If
+
+        End If
+
+   
+
+        pdfSource.Close
+
+        pdfNew.Close
+
+   
+
+        Set pdfSource = Nothing
+
+        Set pdfNew = Nothing
+
+   
+
+    Next i
+
+ 
+
+    MsgBox "Done"
+
+   
+
+End Sub
